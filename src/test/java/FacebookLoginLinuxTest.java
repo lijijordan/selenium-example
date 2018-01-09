@@ -61,7 +61,7 @@ public class FacebookLoginLinuxTest {
     public void init() {
         System.setProperty(
                 "webdriver.chrome.driver",
-                "/usr/local/bin/chromedriver");
+                "/root/selenium-example/chromedriver");
         accounts = readTxtFileIntoStringArrList(filePath);
         for (String s :
                 accounts) {
