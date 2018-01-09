@@ -82,6 +82,7 @@ public class FacebookLoginLinuxTest {
         capabilities.setCapability(CapabilityType.ForSeleniumServer.ONLY_PROXYING_SELENIUM_TRAFFIC, true);
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--headless");
+        chromeOptions.addArguments("--no-sandbox");
 //        chromeOptions.addArguments("--window-size=400,800");
 //        chromeOptions.addArguments("--proxy-server=socks5://127.0.0.1:2080");
         capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
