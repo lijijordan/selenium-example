@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class FacebookLoginLinuxTest {
 
-    private static final String filePath = "/Users/liji/Downloads/10group/dd.txt_1402.txt";
+    private static final String filePath = "/root/selenium-example/users/dd.txt_1402.txt";
     private List<String> accounts;
     private LinkedList<Account> accountList = new LinkedList<>();
 
@@ -61,7 +61,7 @@ public class FacebookLoginLinuxTest {
     public void init() {
         System.setProperty(
                 "webdriver.chrome.driver",
-                "webdriver/chromedriver");
+                "/usr/local/bin/chromedriver");
         accounts = readTxtFileIntoStringArrList(filePath);
         for (String s :
                 accounts) {
@@ -81,12 +81,12 @@ public class FacebookLoginLinuxTest {
         capabilities.setCapability(CapabilityType.ForSeleniumServer.AVOIDING_PROXY, true);
         capabilities.setCapability(CapabilityType.ForSeleniumServer.ONLY_PROXYING_SELENIUM_TRAFFIC, true);
         ChromeOptions chromeOptions = new ChromeOptions();
-//        chromeOptions.addArguments("--headless");
-        chromeOptions.addArguments("--window-size=400,800");
-        chromeOptions.addArguments("--proxy-server=socks5://127.0.0.1:2080");
+        chromeOptions.addArguments("--headless");
+//        chromeOptions.addArguments("--window-size=400,800");
+//        chromeOptions.addArguments("--proxy-server=socks5://127.0.0.1:2080");
         capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
         driver = new ChromeDriver(capabilities);
-        this.driver.get("http://ip.cn");
+//        this.driver.get("http://ip.cn");
         this.reload();
     }
 
