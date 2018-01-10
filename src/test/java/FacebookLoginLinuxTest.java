@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class FacebookLoginLinuxTest {
 
-    private static final String FILE_PA = "/root/selenium-example/users/dd.txt_1401.txt";
+    private static final String FILE_PA = "/root/selenium-example/users/dd.txt_1403.txt";
     private static final String CHROME_PATH = "/root/selenium-example/chromedriver";
     //    private static final String CHROME_PATH = "webdriver/chromedriver";
 //    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1402.txt";
