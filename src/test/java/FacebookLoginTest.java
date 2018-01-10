@@ -75,7 +75,7 @@ public class FacebookLoginTest {
                 accountList.add(accountObj);
             }
         }
-        System.out.println("Account size : " + accountList.size());
+        System.out.println("SourceData size : " + accountList.size());
 
         DesiredCapabilities capabilities = DesiredCapabilities.chrome();
         capabilities.setCapability(CapabilityType.ForSeleniumServer.AVOIDING_PROXY, true);

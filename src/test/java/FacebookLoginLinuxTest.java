@@ -1,3 +1,6 @@
+import bean.FBData;
+import bean.SourceData;
+import dao.UserDao;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -10,7 +13,10 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,11 +32,15 @@ import java.util.List;
  */
 public class FacebookLoginLinuxTest {
 
-    private static final String filePath = "/root/selenium-example/users/dd.txt_1402.txt";
+    //    private static final String filePath = "/root/selenium-example/users/dd.txt_1402.txt";
+    private static final String filePath = "/Users/liji/github/fblogin/users/dd.txt_1402.txt";
+    private static final String FB_URL = "https://m.facebook.com";
     private List<String> accounts;
-    private LinkedList<Account> accountList = new LinkedList<>();
+    private LinkedList<SourceData> accountList = new LinkedList<>();
 
     private WebDriver driver;
+    private ApplicationContext context;
+    private UserDao userDao;
 
     public static List<String> readTxtFileIntoStringArrList(String filePath) {
         List<String> list = new ArrayList<String>();
@@ -59,9 +69,12 @@ public class FacebookLoginLinuxTest {
 
     @Before
     public void init() {
+        context = new ClassPathXmlApplicationContext("SpringConfig.xml");
+        userDao = new UserDao((DataSource) context.getBean("dataSource"));
         System.setProperty(
                 "webdriver.chrome.driver",
-                "/root/selenium-example/chromedriver");
+//                "/root/selenium-example/chromedriver");
+                "webdriver/chromedriver");
         accounts = readTxtFileIntoStringArrList(filePath);
         for (String s :
                 accounts) {
@@ -69,21 +82,21 @@ public class FacebookLoginLinuxTest {
             if (s1 != null) {
                 String name = s1[0];
                 String password = s1[1];
-                Account accountObj = new Account();
+                SourceData accountObj = new SourceData();
                 accountObj.setName(name);
                 accountObj.setPassword(password);
                 accountList.add(accountObj);
             }
         }
-        System.out.println("Account size : " + accountList.size());
+        System.out.println("SourceData size : " + accountList.size());
 
         DesiredCapabilities capabilities = DesiredCapabilities.chrome();
         capabilities.setCapability(CapabilityType.ForSeleniumServer.AVOIDING_PROXY, true);
         capabilities.setCapability(CapabilityType.ForSeleniumServer.ONLY_PROXYING_SELENIUM_TRAFFIC, true);
         ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless");
-        chromeOptions.addArguments("--no-sandbox");
-//        chromeOptions.addArguments("--window-size=400,800");
+//        chromeOptions.addArguments("--headless");
+//        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--window-size=400,800");
 //        chromeOptions.addArguments("--proxy-server=socks5://127.0.0.1:2080");
         capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
         driver = new ChromeDriver(capabilities);
@@ -93,11 +106,11 @@ public class FacebookLoginLinuxTest {
 
     private void reload() {
         driver.manage().deleteAllCookies();
-        driver.get("https://m.facebook.com");
+        driver.get(FB_URL);
     }
 
 
-    private void loginFacebook(Account account) {
+    private void loginFacebook(SourceData account) {
         long start = System.currentTimeMillis();
         try {
             this.reload();
@@ -122,46 +135,35 @@ public class FacebookLoginLinuxTest {
             );
         } catch (RuntimeException e) {
         } finally {
-            System.out.println("Close driver!");
+//            System.out.println("Close driver!");
 //            driver.close();
 //            driver.quit();
         }
         System.out.println(String.format("Current url : %s", driver.getCurrentUrl()));
+        // 登录成功
+        FBData fbData = FBData.form(account);
+        if (driver.getCurrentUrl().indexOf("checkpoint") >= 0) {
+            fbData.setType("checkpoint");
+        } else {
+            fbData.setType("none");
+        }
+        fbData.setRedirectUrl(driver.getCurrentUrl());
+        this.userDao.insertFBData(fbData);
         System.out.println("Cost time:" + (System.currentTimeMillis() - start));
     }
 
+
     @Test
     public void loginFacebook() {
-        Account account = this.popAccount();
+        SourceData account = this.popAccount();
         while (account != null) {
             this.loginFacebook(account);
             account = this.popAccount();
         }
     }
 
-    private Account popAccount() {
+
+    private SourceData popAccount() {
         return this.accountList.pop();
     }
-
-    static class Account {
-        String name;
-        String password;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-    }
-
 }
