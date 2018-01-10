@@ -107,12 +107,6 @@ public class FacebookLoginLinuxTest {
 //        chromeOptions.addArguments("--proxy-server=socks5://127.0.0.1:2080");
         capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
         driver = new ChromeDriver(capabilities);
-        this.reload();
-    }
-
-    private void reload() {
-        driver.manage().deleteAllCookies();
-        driver.get(FB_URL);
     }
 
 
@@ -121,7 +115,8 @@ public class FacebookLoginLinuxTest {
         FBData fbData = FBData.form(account);
         fbData.setType("none");
         try {
-            this.reload();
+            driver.manage().deleteAllCookies();
+            driver.get(FB_URL);
             System.out.println(String.format("====== Ready to login : %s / %s ======", account.getName(), account.getPassword()));
             WebElement formEmail = driver.findElement(By.name("email"));
             formEmail.sendKeys(account.getName());
