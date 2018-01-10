@@ -32,8 +32,8 @@ import java.util.List;
  */
 public class FacebookLoginLinuxTest {
 
-    //    private static final String filePath = "/root/selenium-example/users/dd.txt_1402.txt";
-    private static final String filePath = "/Users/liji/github/fblogin/users/dd.txt_1402.txt";
+        private static final String filePath = "/root/selenium-example/users/dd.txt_1401.txt";
+//    private static final String filePath = "/Users/liji/github/fblogin/users/dd.txt_1402.txt";
     private static final String FB_URL = "https://m.facebook.com";
     private List<String> accounts;
     private LinkedList<SourceData> accountList = new LinkedList<>();
@@ -73,8 +73,8 @@ public class FacebookLoginLinuxTest {
         userDao = new UserDao((DataSource) context.getBean("dataSource"));
         System.setProperty(
                 "webdriver.chrome.driver",
-//                "/root/selenium-example/chromedriver");
-                "webdriver/chromedriver");
+                "/root/selenium-example/chromedriver");
+//                "webdriver/chromedriver");
         accounts = readTxtFileIntoStringArrList(filePath);
         for (String s :
                 accounts) {
@@ -94,9 +94,9 @@ public class FacebookLoginLinuxTest {
         capabilities.setCapability(CapabilityType.ForSeleniumServer.AVOIDING_PROXY, true);
         capabilities.setCapability(CapabilityType.ForSeleniumServer.ONLY_PROXYING_SELENIUM_TRAFFIC, true);
         ChromeOptions chromeOptions = new ChromeOptions();
-//        chromeOptions.addArguments("--headless");
-//        chromeOptions.addArguments("--no-sandbox");
-        chromeOptions.addArguments("--window-size=400,800");
+        chromeOptions.addArguments("--headless");
+        chromeOptions.addArguments("--no-sandbox");
+//        chromeOptions.addArguments("--window-size=400,800");
 //        chromeOptions.addArguments("--proxy-server=socks5://127.0.0.1:2080");
         capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
         driver = new ChromeDriver(capabilities);
