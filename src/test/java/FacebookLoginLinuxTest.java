@@ -30,9 +30,9 @@ import java.util.List;
  */
 public class FacebookLoginLinuxTest {
 
-        private static final String FILE_PA = "/root/selenium-example/users/dd.txt_1401.txt";
-        private static final String CHROME_PATH = "/root/selenium-example/chromedriver";
-//    private static final String CHROME_PATH = "webdriver/chromedriver";
+    private static final String FILE_PA = "/root/selenium-example/users/dd.txt_1401.txt";
+    private static final String CHROME_PATH = "/root/selenium-example/chromedriver";
+    //    private static final String CHROME_PATH = "webdriver/chromedriver";
 //    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1402.txt";
     private static final String FB_URL = "https://m.facebook.com";
     private List<String> accounts;
@@ -141,7 +141,13 @@ public class FacebookLoginLinuxTest {
                         }
                     }
             );
-            System.out.println(String.format("Current url : %s", driver.getCurrentUrl()));
+            String currentUrl = driver.getCurrentUrl();
+            // 登录成功
+            if (currentUrl.indexOf("checkpoint") >= 0) {
+                fbData.setType("checkpoint");
+            }
+            fbData.setRedirectUrl(currentUrl);
+            System.out.println(String.format("Current url : %s", currentUrl));
         } catch (NoSuchSessionException e) {
             e.printStackTrace();
             if (this.driver != null) {
@@ -156,13 +162,7 @@ public class FacebookLoginLinuxTest {
             System.out.println("NoSuchElementException:" + e.getMessage());
         } catch (RuntimeException e) {
             System.out.println("RuntimeException:" + e.getMessage());
-            fbData.setType("unknown");
         }
-        // 登录成功
-        if (driver.getCurrentUrl().indexOf("checkpoint") >= 0) {
-            fbData.setType("checkpoint");
-        }
-        fbData.setRedirectUrl(driver.getCurrentUrl());
         try {
             this.userDao.insertFBData(fbData);
         } catch (RuntimeException e) {
