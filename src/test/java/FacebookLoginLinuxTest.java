@@ -3,9 +3,13 @@ import bean.SourceData;
 import dao.UserDao;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -31,9 +35,11 @@ import java.util.List;
 public class FacebookLoginLinuxTest {
 
     private static final String FILE_PA = "/root/selenium-example/users/dd.txt_1403.txt";
-    private static final String CHROME_PATH = "/root/selenium-example/chromedriver";
-    //    private static final String CHROME_PATH = "webdriver/chromedriver";
-//    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1402.txt";
+    //    private static final String CHROME_PATH = "/root/selenium-example/chromedriver";
+    private static final String CHROME_PATH = "webdriver/chromedriver";
+    //    private static final String GECKO_PATH = "webdriver/geckodriver";
+    private static final String GECKO_PATH = "/root/geckodriver";
+    //    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1402.txt";
     private static final String FB_URL = "https://m.facebook.com";
     private List<String> accounts;
     private LinkedList<SourceData> accountList = new LinkedList<>();
@@ -71,9 +77,6 @@ public class FacebookLoginLinuxTest {
     public void init() {
         context = new ClassPathXmlApplicationContext("SpringConfig.xml");
         userDao = new UserDao((DataSource) context.getBean("dataSource"));
-        System.setProperty(
-                "webdriver.chrome.driver",
-                CHROME_PATH);
         accounts = readTxtFileIntoStringArrList(FILE_PA);
         for (String s :
                 accounts) {
@@ -88,15 +91,25 @@ public class FacebookLoginLinuxTest {
             }
         }
         System.out.println("SourceData size : " + accountList.size());
-//        this.driver.get("http://ip.cn");
-        this.initDriver();
+//        this.initChromeDriver();
+        this.initGeckoDriver();
+    }
+
+    private void initGeckoDriver() {
+        FirefoxOptions options = new FirefoxOptions();
+//        options.setHeadless(true);
+        System.setProperty("webdriver.gecko.driver", GECKO_PATH);
+        driver = new FirefoxDriver(options);
     }
 
     /**
      * 初始化浏览器
      */
-    private void initDriver() {
+    private void initChromeDriver() {
         System.out.println("Init Driver!!!!");
+        System.setProperty(
+                "webdriver.chrome.driver",
+                CHROME_PATH);
         DesiredCapabilities capabilities = DesiredCapabilities.chrome();
         capabilities.setCapability(CapabilityType.ForSeleniumServer.AVOIDING_PROXY, true);
         capabilities.setCapability(CapabilityType.ForSeleniumServer.ONLY_PROXYING_SELENIUM_TRAFFIC, true);
@@ -114,6 +127,7 @@ public class FacebookLoginLinuxTest {
         long start = System.currentTimeMillis();
         FBData fbData = FBData.form(account);
         fbData.setType("none");
+        String currentUrl = "";
         try {
             driver.manage().deleteAllCookies();
             driver.get(FB_URL);
@@ -130,34 +144,25 @@ public class FacebookLoginLinuxTest {
 
                         @Override
                         public Boolean apply(WebDriver driver) {
-                            WebElement msg = driver.findElement(By.xpath("//*[@id=\"root\"]/div[1]/div/div[1]/div/span"));
-                            System.out.println(String.format("Message:%s", msg.getText()));
+//                            WebElement msg = driver.findElement(By.xpath("//*[@id=\"root\"]/div[1]/div/div[1]/div/span"));
+                            WebElement msg1 = driver.findElement(By.cssSelector(".ba"));
+//                            WebElement msg2 = driver.findElement(By.cssSelector(".ba > span:nth-child(1)"));
+                            System.out.println(String.format("Message1:%s", msg1.getText()));
+                            fbData.setMessage(msg1.getText());
                             return true;
                         }
                     }
             );
-            String currentUrl = driver.getCurrentUrl();
-            // 登录成功
-            if (currentUrl.indexOf("checkpoint") >= 0) {
-                fbData.setType("checkpoint");
-            }
-            fbData.setRedirectUrl(currentUrl);
+            currentUrl = driver.getCurrentUrl();
             System.out.println(String.format("Current url : %s", currentUrl));
-        } catch (NoSuchSessionException e) {
-            e.printStackTrace();
-            if (this.driver != null) {
-                System.out.println("Close driver!");
-                this.driver.close();
-                this.driver.quit();
-            }
-            this.initDriver();
-        } catch (ElementNotVisibleException e) {
-            System.out.println("ElementNotVisibleException:" + e.getMessage());
-        } catch (NoSuchElementException e) {
-            System.out.println("NoSuchElementException:" + e.getMessage());
         } catch (RuntimeException e) {
             System.out.println("RuntimeException:" + e.getMessage());
         }
+        // 登录成功
+        if (currentUrl.indexOf("checkpoint") >= 0) {
+            fbData.setType("checkpoint");
+        }
+        fbData.setRedirectUrl(currentUrl);
         try {
             this.userDao.insertFBData(fbData);
         } catch (RuntimeException e) {

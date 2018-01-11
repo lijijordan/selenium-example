@@ -9,6 +9,7 @@ public class FBData {
     String type;
     Date createTime;
     String redirectUrl;
+    String message;
 
     public static FBData form(SourceData sourceData) {
         FBData fbData = new FBData();
@@ -16,6 +17,14 @@ public class FBData {
         fbData.setName(sourceData.getName());
         fbData.setPassword(sourceData.getPassword());
         return fbData;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getRedirectUrl() {
