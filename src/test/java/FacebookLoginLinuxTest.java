@@ -146,14 +146,14 @@ public class FacebookLoginLinuxTest {
             formPassword.sendKeys(account.getPassword());
             driver.findElement(By.name("login")).click();
             long t3 = System.currentTimeMillis();
-            new WebDriverWait(driver, 1).until(
+            new WebDriverWait(driver, 5).until(
                     new ExpectedCondition<Boolean>() {
                         boolean ind = false;
 
                         @Override
                         public Boolean apply(WebDriver driver) {
-//                            WebElement msg = driver.findElement(By.xpath("//*[@id=\"root\"]/div[1]/div/div[1]/div/span"));
-                            WebElement msg1 = driver.findElement(By.cssSelector(".ba"));
+                            WebElement msg1 = driver.findElement(By.cssSelector("#u_0_0 > div._5yd0._2ph-._5yd1 > div"));
+//                            WebElement msg1 = driver.findElement(By.cssSelector(".ba"));
 //                            WebElement msg2 = driver.findElement(By.cssSelector(".ba > span:nth-child(1)"));
                             System.out.println(String.format("Message1:%s", msg1.getText()));
                             fbData.setMessage(msg1.getText());
