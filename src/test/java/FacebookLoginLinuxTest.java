@@ -10,6 +10,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -98,12 +99,14 @@ public class FacebookLoginLinuxTest {
     private void initGeckoDriver() {
         FirefoxOptions options = new FirefoxOptions();
         options.setHeadless(true);
-        options.addPreference("browser.tabs.remote.autostart", "false");
-        options.addPreference("browser.tabs.remote.autostart.1", "false");
-        options.addPreference("browser.tabs.remote.autostart.2", "false");
-        options.addPreference("browser.tabs.remote.force-enable", "false");
         options.addPreference("security.sandbox.content.level", 4);
         System.setProperty("webdriver.gecko.driver", GECKO_PATH);
+        FirefoxProfile profile = new FirefoxProfile();
+        profile.setPreference("browser.tabs.remote.autostart", false);
+        profile.setPreference("browser.tabs.remote.autostart.1", false);
+        profile.setPreference("browser.tabs.remote.autostart.2", false);
+        profile.setPreference("browser.tabs.remote.force-enable", "false");
+        options.setProfile(profile);
         driver = new FirefoxDriver(options);
     }
 
