@@ -98,7 +98,7 @@ public class FacebookLoginLinuxTest {
     private void initGeckoDriver() {
         FirefoxOptions options = new FirefoxOptions();
         options.setHeadless(true);
-        options.addPreference("security.sandbox.content.level", 5);
+        options.addPreference("security.sandbox.content.level", 4);
         System.setProperty("webdriver.gecko.driver", GECKO_PATH);
         driver = new FirefoxDriver(options);
     }
