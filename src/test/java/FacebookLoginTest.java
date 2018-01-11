@@ -7,7 +7,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -98,7 +97,6 @@ public class FacebookLoginTest {
 
     private void loginFacebook(Account account) {
         long start = System.currentTimeMillis();
-        try {
             this.reload();
             System.out.println(String.format("====== Ready to login : %s / %s ======", account.getName(), account.getPassword()));
             WebElement formEmail = driver.findElement(By.name("email"));
@@ -107,24 +105,10 @@ public class FacebookLoginTest {
             formPassword.sendKeys(account.getPassword());
             driver.findElement(By.name("login")).click();
             long t3 = System.currentTimeMillis();
-            new WebDriverWait(driver, 1).until(
-                    new ExpectedCondition<Boolean>() {
-                        boolean ind = false;
 
-                        @Override
-                        public Boolean apply(WebDriver driver) {
-                            WebElement msg = driver.findElement(By.xpath("//*[@id=\"root\"]/div[1]/div/div[1]/div/span"));
-                            System.out.println(String.format("Message:%s", msg.getText()));
-                            return true;
-                        }
-                    }
-            );
-        } catch (RuntimeException e) {
-        } finally {
-            System.out.println("Close driver!");
-//            driver.close();
-//            driver.quit();
-        }
+            WebElement result = new WebDriverWait(driver, 2).until(ExpectedConditions.presenceOfElementLocated(By.id("checkpoint_title")));
+
+
         System.out.println(String.format("Current url : %s", driver.getCurrentUrl()));
         System.out.println("Cost time:" + (System.currentTimeMillis() - start));
     }

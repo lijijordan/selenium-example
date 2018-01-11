@@ -13,7 +13,6 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.context.ApplicationContext;
@@ -35,12 +34,12 @@ import java.util.List;
  */
 public class FacebookLoginLinuxTest {
 
-    private static final String FILE_PA = "/root/selenium-example/users/dd.txt_1403.txt";
-        private static final String CHROME_PATH = "/root/selenium-example/chromedriver";
+        private static final String FILE_PA = "/root/selenium-example/users/dd.txt_1403.txt";
+    private static final String CHROME_PATH = "/root/selenium-example/chromedriver";
 //    private static final String CHROME_PATH = "webdriver/chromedriver";
     //    private static final String GECKO_PATH = "webdriver/geckodriver";
     private static final String GECKO_PATH = "/root/geckodriver";
-    //    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1402.txt";
+//    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1402.txt";
     private static final String FB_URL = "https://m.facebook.com";
     private List<String> accounts;
     private LinkedList<SourceData> accountList = new LinkedList<>();
@@ -137,7 +136,6 @@ public class FacebookLoginLinuxTest {
         fbData.setType("none");
         String currentUrl = "";
         try {
-            driver.manage().deleteAllCookies();
             driver.get(FB_URL);
             System.out.println(String.format("====== Ready to login : %s / %s ======", account.getName(), account.getPassword()));
             WebElement formEmail = driver.findElement(By.name("email"));
@@ -146,26 +144,14 @@ public class FacebookLoginLinuxTest {
             formPassword.sendKeys(account.getPassword());
             driver.findElement(By.name("login")).click();
             long t3 = System.currentTimeMillis();
-            new WebDriverWait(driver, 5).until(
-                    new ExpectedCondition<Boolean>() {
-                        boolean ind = false;
-
-                        @Override
-                        public Boolean apply(WebDriver driver) {
-                            WebElement msg1 = driver.findElement(By.cssSelector("#u_0_0 > div._5yd0._2ph-._5yd1 > div"));
-//                            WebElement msg1 = driver.findElement(By.cssSelector(".ba"));
-//                            WebElement msg2 = driver.findElement(By.cssSelector(".ba > span:nth-child(1)"));
-                            System.out.println(String.format("Message1:%s", msg1.getText()));
-                            fbData.setMessage(msg1.getText());
-                            return true;
-                        }
-                    }
-            );
-            currentUrl = driver.getCurrentUrl();
-            System.out.println(String.format("Current url : %s", currentUrl));
+            WebElement result = new WebDriverWait(driver, 2).until(ExpectedConditions.presenceOfElementLocated(By.id("checkpoint_title")));
+            System.out.println(String.format("Result is:%s", result.getText()));
+            fbData.setMessage(result.getText());
         } catch (RuntimeException e) {
             System.out.println("RuntimeException:" + e.getMessage());
         }
+        currentUrl = driver.getCurrentUrl();
+        System.out.println(String.format("Current url : %s", currentUrl));
         // 登录成功
         if (currentUrl.indexOf("checkpoint") >= 0) {
             fbData.setType("checkpoint");
