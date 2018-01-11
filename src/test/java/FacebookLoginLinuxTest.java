@@ -98,9 +98,9 @@ public class FacebookLoginLinuxTest {
     private void initGeckoDriver() {
         FirefoxOptions options = new FirefoxOptions();
         options.setHeadless(true);
-        options.addPreference("browser.tabs.remote.autostart", false);
-        options.addPreference("browser.tabs.remote.autostart.1", false);
-        options.addPreference("browser.tabs.remote.autostart.2", false);
+        options.addPreference("browser.tabs.remote.autostart", "false");
+        options.addPreference("browser.tabs.remote.autostart.1", "false");
+        options.addPreference("browser.tabs.remote.autostart.2", "false");
         options.addPreference("browser.tabs.remote.force-enable", "false");
         options.addPreference("security.sandbox.content.level", 4);
         System.setProperty("webdriver.gecko.driver", GECKO_PATH);
