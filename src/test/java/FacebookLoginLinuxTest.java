@@ -39,7 +39,7 @@ public class FacebookLoginLinuxTest {
 //    private static final String CHROME_PATH = "webdriver/chromedriver";
     //    private static final String GECKO_PATH = "webdriver/geckodriver";
     private static final String GECKO_PATH = "/root/geckodriver";
-//    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1402.txt";
+//    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1406.txt";
     private static final String FB_URL = "https://m.facebook.com";
     private List<String> accounts;
     private LinkedList<SourceData> accountList = new LinkedList<>();
@@ -109,6 +109,12 @@ public class FacebookLoginLinuxTest {
         driver = new FirefoxDriver(options);
     }
 
+    public static void main(String[] args) {
+        FacebookLoginLinuxTest test = new FacebookLoginLinuxTest();
+        test.init();
+        test.loginFacebook();
+    }
+
     /**
      * 初始化浏览器
      */
@@ -131,6 +137,7 @@ public class FacebookLoginLinuxTest {
 
 
     private void loginFacebook(SourceData account) {
+        initChromeDriver();
         long start = System.currentTimeMillis();
         FBData fbData = FBData.form(account);
         fbData.setType("none");
@@ -163,6 +170,7 @@ public class FacebookLoginLinuxTest {
             System.out.println("insert record fail:" + e.getMessage());
         }
         System.out.println("Cost time:" + (System.currentTimeMillis() - start));
+        driver.quit();
     }
 
 
