@@ -11,8 +11,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.context.ApplicationContext;
@@ -31,6 +29,7 @@ import java.util.List;
  * User: liji
  * Date: 18/1/4
  * Time: 下午7:56
+ * ps -ef | grep chrome | grep -v grep | awk '{print $2}' | xargs kill
  */
 public class FacebookLoginLinuxTest {
 
@@ -123,16 +122,16 @@ public class FacebookLoginLinuxTest {
         System.setProperty(
                 "webdriver.chrome.driver",
                 CHROME_PATH);
-        DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-        capabilities.setCapability(CapabilityType.ForSeleniumServer.AVOIDING_PROXY, true);
-        capabilities.setCapability(CapabilityType.ForSeleniumServer.ONLY_PROXYING_SELENIUM_TRAFFIC, true);
+//        DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+//        capabilities.setCapability(CapabilityType.ForSeleniumServer.AVOIDING_PROXY, true);
+//        capabilities.setCapability(CapabilityType.ForSeleniumServer.ONLY_PROXYING_SELENIUM_TRAFFIC, true);
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--headless");
         chromeOptions.addArguments("--no-sandbox");
 //        chromeOptions.addArguments("--window-size=400,800");
 //        chromeOptions.addArguments("--proxy-server=socks5://127.0.0.1:2080");
-        capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
-        driver = new ChromeDriver(capabilities);
+//        capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+        driver = new ChromeDriver(chromeOptions);
     }
 
 
@@ -157,8 +156,8 @@ public class FacebookLoginLinuxTest {
         } catch (RuntimeException e) {
             System.out.println("RuntimeException:" + e.getMessage());
         }
-        currentUrl = driver.getCurrentUrl();
-        System.out.println(String.format("Current url : %s", currentUrl));
+//        currentUrl = driver.getCurrentUrl();
+//        System.out.println(String.format("Current url : %s", currentUrl));
         // 登录成功
         if (currentUrl.indexOf("checkpoint") >= 0) {
             fbData.setType("checkpoint");
