@@ -17,10 +17,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.sql.DataSource;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,6 +77,12 @@ public class FacebookLoginLinuxTest {
 
     @Before
     public void init() {
+        try {
+            System.out.println("exec : ps -ef | grep chrome | grep -v grep | awk '{print $2}' | xargs kill");
+            Runtime.getRuntime().exec("ps -ef | grep chrome | grep -v grep | awk '{print $2}' | xargs kill");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         context = new ClassPathXmlApplicationContext("SpringConfig.xml");
         userDao = new UserDao((DataSource) context.getBean("dataSource"));
         accounts = readTxtFileIntoStringArrList(FILE_PA);
