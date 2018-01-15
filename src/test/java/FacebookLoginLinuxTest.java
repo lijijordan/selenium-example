@@ -96,7 +96,7 @@ public class FacebookLoginLinuxTest {
             }
         }
         System.out.println("SourceData size : " + accountList.size());
-        this.initChromeDriver();
+//        this.initChromeDriver();
 //        this.initGeckoDriver();
     }
 
