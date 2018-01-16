@@ -149,7 +149,9 @@ public class FacebookLoginLinuxTest {
 
     @Test
     public void loginFacebook() {
+        System.out.println("Login Facebook!!!");
         String source = this.consumer.consume();
+        System.out.println("load source:" + source);
         if (source != null) {
             SourceData user = this.parseUser(source);
             if (user != null) {
