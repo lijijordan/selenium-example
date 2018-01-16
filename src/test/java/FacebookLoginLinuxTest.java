@@ -161,6 +161,12 @@ public class FacebookLoginLinuxTest {
         }
     }
 
+    @Test
+    public void consume() {
+        this.producer.publish("test123");
+        System.out.println(consumer.consume());
+    }
+
     private SourceData parseUser(String source) {
         String[] s1 = source.split("\\s+");
         if (s1 != null) {
