@@ -57,19 +57,23 @@ public class FacebookLoginLinuxTest {
 
     @Before
     public void init() {
+        this.killChrome();
+        context = new ClassPathXmlApplicationContext("SpringConfig.xml");
+        userDao = new UserDao((DataSource) context.getBean("dataSource"));
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), REDIS_HOST);
+        producer = new Producer(pool.getResource(), TOPIC);
+        consumer = new Consumer(pool.getResource(), "a subscriber", TOPIC);
+        System.out.println("SourceData size : " + accountList.size());
+    }
+
+    private void killChrome() {
         try {
+            System.out.println("kill chrome thread!");
             System.out.println("exec : ps -ef | grep chrome | grep -v grep | awk '{print $2}' | xargs kill");
             Runtime.getRuntime().exec("ps -ef | grep chrome | grep -v grep | awk '{print $2}' | xargs kill");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        context = new ClassPathXmlApplicationContext("SpringConfig.xml");
-        userDao = new UserDao((DataSource) context.getBean("dataSource"));
-
-        JedisPool pool = new JedisPool(new JedisPoolConfig(), REDIS_HOST);
-        producer = new Producer(pool.getResource(), TOPIC);
-        consumer = new Consumer(pool.getResource(), "a subscriber", TOPIC);
-        System.out.println("SourceData size : " + accountList.size());
     }
 
     private void initGeckoDriver() {
@@ -128,9 +132,14 @@ public class FacebookLoginLinuxTest {
         } catch (RuntimeException e) {
             System.out.println("RuntimeException:" + e.getMessage());
         } finally {
-            if (this.driver != null) {
-                driver.close();
-                driver.quit();
+            try {
+                if (this.driver != null) {
+                    driver.close();
+                    driver.quit();
+                }
+            } catch (org.openqa.selenium.WebDriverException e) {
+                System.out.println("Close driver exception:" + e.getMessage());
+                this.killChrome();
             }
             // 登录成功
             if (currentUrl.indexOf("checkpoint") >= 0) {
