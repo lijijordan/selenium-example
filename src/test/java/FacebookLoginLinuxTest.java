@@ -36,7 +36,7 @@ import java.util.Set;
  */
 public class FacebookLoginLinuxTest {
 
-    private static final String FILE_PA = "/root/selenium-example/users/dd.txt_1403.txt";
+    private static final String FILE_PA = "/root/selenium-example/users";
     private static final String CHROME_PATH = "/root/selenium-example/chromedriver";
     //    private static final String CHROME_PATH = "webdriver/chromedriver";
     //    private static final String GECKO_PATH = "webdriver/geckodriver";
@@ -183,7 +183,7 @@ public class FacebookLoginLinuxTest {
     @Test
     public void initUserQueue() {
         Set<String> set = new HashSet<>();
-        File[] files = new File("/Users/liji/github/fblogin/users").listFiles();
+        File[] files = new File(FILE_PA).listFiles();
         for (File file :
                 files) {
             set.addAll(FileUtils.readTxtFileIntoStringArrList(file));
