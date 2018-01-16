@@ -15,12 +15,18 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
+import redis.rmq.Consumer;
+import redis.rmq.Producer;
+import util.FileUtils;
 
 import javax.sql.DataSource;
-import java.io.*;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
 /**
  * User: liji
@@ -37,43 +43,17 @@ public class FacebookLoginLinuxTest {
     private static final String GECKO_PATH = "/root/geckodriver";
     //    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1406.txt";
     private static final String FB_URL = "https://m.facebook.com";
-    private List<String> accounts;
+    private static final String TOPIC = "fb_user";
+    private static final String REDIS_HOST = "104.236.82.206";
+    private Set<String> accounts;
     private LinkedList<SourceData> accountList = new LinkedList<>();
 
     private WebDriver driver;
     private ApplicationContext context;
     private UserDao userDao;
+    private Producer producer;
+    private Consumer consumer;
 
-    public static List<String> readTxtFileIntoStringArrList(String filePath) {
-        List<String> list = new ArrayList<String>();
-        try {
-            String encoding = "UTF-8";
-            File file = new File(filePath);
-            if (file.isFile() && file.exists()) { // 判断文件是否存在
-                InputStreamReader read = new InputStreamReader(
-                        new FileInputStream(file), encoding);// 考虑到编码格式
-                BufferedReader bufferedReader = new BufferedReader(read);
-                String lineTxt = null;
-                while ((lineTxt = bufferedReader.readLine()) != null) {
-                    list.add(lineTxt);
-                }
-                bufferedReader.close();
-                read.close();
-            } else {
-                System.out.println("找不到指定的文件");
-            }
-        } catch (Exception e) {
-            System.out.println("读取文件内容出错");
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public static void main(String[] args) {
-        FacebookLoginLinuxTest test = new FacebookLoginLinuxTest();
-        test.init();
-        test.loginFacebook();
-    }
 
     @Before
     public void init() {
@@ -85,22 +65,11 @@ public class FacebookLoginLinuxTest {
         }
         context = new ClassPathXmlApplicationContext("SpringConfig.xml");
         userDao = new UserDao((DataSource) context.getBean("dataSource"));
-        accounts = readTxtFileIntoStringArrList(FILE_PA);
-        for (String s :
-                accounts) {
-            String[] s1 = s.split("\\s+");
-            if (s1 != null) {
-                String name = s1[0];
-                String password = s1[1];
-                SourceData accountObj = new SourceData();
-                accountObj.setName(name);
-                accountObj.setPassword(password);
-                accountList.add(accountObj);
-            }
-        }
+
+        JedisPool pool = new JedisPool(new JedisPoolConfig(), REDIS_HOST);
+        producer = new Producer(pool.getResource(), TOPIC);
+        consumer = new Consumer(pool.getResource(), "a subscriber", TOPIC);
         System.out.println("SourceData size : " + accountList.size());
-//        this.initChromeDriver();
-//        this.initGeckoDriver();
     }
 
     private void initGeckoDriver() {
@@ -180,15 +149,41 @@ public class FacebookLoginLinuxTest {
 
     @Test
     public void loginFacebook() {
-        SourceData account = this.popAccount();
-        while (account != null) {
-            this.loginFacebook(account);
-            account = this.popAccount();
+        String source = this.consumer.consume();
+        if (source != null) {
+            SourceData user = this.parseUser(source);
+            if (user != null) {
+                this.loginFacebook(user);
+            }
+            source = this.consumer.consume();
         }
     }
 
+    private SourceData parseUser(String source) {
+        String[] s1 = source.split("\\s+");
+        if (s1 != null) {
+            String name = s1[0];
+            String password = s1[1];
+            SourceData accountObj = new SourceData();
+            accountObj.setName(name);
+            accountObj.setPassword(password);
+            return accountObj;
+        }
+        return null;
+    }
 
-    private SourceData popAccount() {
-        return this.accountList.pop();
+    @Test
+    public void initUserQueue() {
+        Set<String> set = new HashSet<>();
+        File[] files = new File("/Users/liji/github/fblogin/users").listFiles();
+        for (File file :
+                files) {
+            set.addAll(FileUtils.readTxtFileIntoStringArrList(file));
+        }
+        System.out.println(set.size());
+        for (String string : set) {
+            System.out.println(String.format("Ready to publish %s ", string));
+            this.producer.publish(string);
+        }
     }
 }
