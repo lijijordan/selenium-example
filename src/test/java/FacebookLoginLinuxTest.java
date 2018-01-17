@@ -112,7 +112,6 @@ public class FacebookLoginLinuxTest {
 
 
     private void loginFacebook(SourceData account, String source) {
-        initChromeDriver();
         long start = System.currentTimeMillis();
         FBData fbData = FBData.form(account);
         fbData.setType("none");
@@ -135,16 +134,17 @@ public class FacebookLoginLinuxTest {
             try {
                 if (this.driver != null) {
                     driver.close();
-                    driver.quit();
                 }
             } catch (org.openqa.selenium.WebDriverException e) {
                 try {
-                    // 
+                    //
                     this.producer.publish(source);
                     System.out.println("Close driver exception:" + e.getMessage());
                     System.out.println("Waiting for 10 second.");
                     Thread.sleep(1000 * 10);
                     this.killChrome();
+                    Thread.sleep(1000 * 10);
+                    initChromeDriver();
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
