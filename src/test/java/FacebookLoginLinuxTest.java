@@ -63,18 +63,19 @@ public class FacebookLoginLinuxTest {
         JedisPool pool = new JedisPool(new JedisPoolConfig(), REDIS_HOST);
         producer = new Producer(pool.getResource(), TOPIC);
         consumer = new Consumer(pool.getResource(), "a subscriber", TOPIC);
-        initChromeDriver();
+        System.out.println("SourceData size : " + accountList.size());
     }
 
     private void killChrome() {
         try {
             System.out.println("kill chrome thread!");
-            System.out.println("exec : ps -ef | grep chrome | grep -v grep | awk '{print $2}' | xargs kill");
+            System.out.println("exec : ps -ef | grep ChromeDriver | grep -v grep | awk '{print $2}' | xargs kill");
             Runtime.getRuntime().exec("ps -ef | grep chrome | grep -v grep | awk '{print $2}' | xargs kill");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     private void initGeckoDriver() {
         FirefoxOptions options = new FirefoxOptions();
@@ -112,6 +113,7 @@ public class FacebookLoginLinuxTest {
 
 
     private void loginFacebook(SourceData account, String source) {
+        initChromeDriver();
         long start = System.currentTimeMillis();
         FBData fbData = FBData.form(account);
         fbData.setType("none");
@@ -134,6 +136,7 @@ public class FacebookLoginLinuxTest {
             try {
                 if (this.driver != null) {
                     driver.close();
+                    driver.quit();
                 }
             } catch (org.openqa.selenium.WebDriverException e) {
                 try {
@@ -144,7 +147,6 @@ public class FacebookLoginLinuxTest {
                     Thread.sleep(1000 * 10);
                     this.killChrome();
                     Thread.sleep(1000 * 10);
-                    initChromeDriver();
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
