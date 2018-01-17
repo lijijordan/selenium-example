@@ -38,7 +38,7 @@ public class FacebookLoginLinuxTest {
 
     private static final String FILE_PA = "/root/selenium-example/users";
     private static final String CHROME_PATH = "/root/selenium-example/chromedriver";
-    //    private static final String CHROME_PATH = "webdriver/chromedriver";
+//        private static final String CHROME_PATH = "webdriver/chromedriver";
     //    private static final String GECKO_PATH = "webdriver/geckodriver";
     private static final String GECKO_PATH = "/root/geckodriver";
     //    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1406.txt";
@@ -63,13 +63,12 @@ public class FacebookLoginLinuxTest {
         JedisPool pool = new JedisPool(new JedisPoolConfig(), REDIS_HOST);
         producer = new Producer(pool.getResource(), TOPIC);
         consumer = new Consumer(pool.getResource(), "a subscriber", TOPIC);
-        System.out.println("SourceData size : " + accountList.size());
     }
 
     private void killChrome() {
         try {
             System.out.println("kill chrome thread!");
-            System.out.println("exec : ps -ef | grep ChromeDriver | grep -v grep | awk '{print $2}' | xargs kill");
+            System.out.println("exec : ps -ef | grep chrome | grep -v grep | awk '{print $2}' | xargs kill");
             Runtime.getRuntime().exec("ps -ef | grep chrome | grep -v grep | awk '{print $2}' | xargs kill");
         } catch (IOException e) {
             e.printStackTrace();
@@ -103,7 +102,7 @@ public class FacebookLoginLinuxTest {
 //        capabilities.setCapability(CapabilityType.ForSeleniumServer.AVOIDING_PROXY, true);
 //        capabilities.setCapability(CapabilityType.ForSeleniumServer.ONLY_PROXYING_SELENIUM_TRAFFIC, true);
         ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless");
+//        chromeOptions.addArguments("--headless");
         chromeOptions.addArguments("--no-sandbox");
 //        chromeOptions.addArguments("--window-size=400,800");
 //        chromeOptions.addArguments("--proxy-server=socks5://127.0.0.1:2080");
@@ -127,9 +126,18 @@ public class FacebookLoginLinuxTest {
             formPassword.sendKeys(account.getPassword());
             driver.findElement(By.name("login")).click();
             long t3 = System.currentTimeMillis();
-            WebElement result = new WebDriverWait(driver, 2).until(ExpectedConditions.presenceOfElementLocated(By.id("checkpoint_title")));
-            System.out.println(String.format("Result is:%s", result.getText()));
-            fbData.setMessage(result.getText());
+//            WebElement result = new WebDriverWait(driver, 2).until(ExpectedConditions.presenceOfElementLocated(By.id("checkpoint_title")));
+            WebElement result = new WebDriverWait(driver, 2).until(ExpectedConditions.presenceOfElementLocated(By.id("checkpointSubmitButton-actual-button")));
+            if(result != null){
+                result.click();
+            }
+            WebElement photoText = new WebDriverWait(driver, 2).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[text()=\"Identify photos of friends\"]")));
+            if(photoText != null){
+                System.out.println(String.format("Result is:%s", photoText.getText()));
+                fbData.setMessage(photoText.getText());
+            }else {
+                fbData.setMessage("NO PHOTO!");
+            }
         } catch (RuntimeException e) {
             System.out.println("RuntimeException:" + e.getMessage());
         } finally {
@@ -143,9 +151,10 @@ public class FacebookLoginLinuxTest {
                     //
                     this.producer.publish(source);
                     System.out.println("Close driver exception:" + e.getMessage());
-                    System.out.println("Waiting for 10 second.");
+                    System.out.println("Waiting for 10 second.....");
                     Thread.sleep(1000 * 10);
                     this.killChrome();
+                    System.out.println("Waiting for 10 second.....");
                     Thread.sleep(1000 * 10);
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
@@ -167,6 +176,15 @@ public class FacebookLoginLinuxTest {
 
 
     @Test
+    public void loginSingleFacebook() {
+        System.out.println("Let us login FB!!!");
+        SourceData user = new SourceData();
+        user.setName("marilyn_letch@yahoo.com");
+        user.setPassword("gram49");
+        this.loginFacebook(user, "");
+    }
+
+    @Test
     public void loginFacebook() {
         System.out.println("Let us login FB!!!");
         String source = this.consumer.consume();
@@ -181,7 +199,7 @@ public class FacebookLoginLinuxTest {
 
     @Test
     public void consume() {
-        this.producer.publish("test123");
+//        this.producer.publish("test123");
         System.out.println(consumer.consume());
     }
 
