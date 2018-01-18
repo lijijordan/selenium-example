@@ -38,7 +38,7 @@ public class FacebookLoginLinuxTest {
 
     private static final String FILE_PA = "/root/selenium-example/users";
     private static final String CHROME_PATH = "/root/selenium-example/chromedriver";
-//        private static final String CHROME_PATH = "webdriver/chromedriver";
+    //        private static final String CHROME_PATH = "webdriver/chromedriver";
     //    private static final String GECKO_PATH = "webdriver/geckodriver";
     private static final String GECKO_PATH = "/root/geckodriver";
     //    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1406.txt";
@@ -107,7 +107,12 @@ public class FacebookLoginLinuxTest {
 //        chromeOptions.addArguments("--window-size=400,800");
 //        chromeOptions.addArguments("--proxy-server=socks5://127.0.0.1:2080");
 //        capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
-        driver = new ChromeDriver(chromeOptions);
+        try {
+            driver = new ChromeDriver(chromeOptions);
+        } catch (org.openqa.selenium.WebDriverException e) {
+            System.out.println("Create chrome driver failed!!!");
+            System.out.println(e.getMessage());
+        }
     }
 
 
@@ -128,14 +133,14 @@ public class FacebookLoginLinuxTest {
             long t3 = System.currentTimeMillis();
 //            WebElement result = new WebDriverWait(driver, 2).until(ExpectedConditions.presenceOfElementLocated(By.id("checkpoint_title")));
             WebElement result = new WebDriverWait(driver, 2).until(ExpectedConditions.presenceOfElementLocated(By.id("checkpointSubmitButton-actual-button")));
-            if(result != null){
+            if (result != null) {
                 result.click();
             }
             WebElement photoText = new WebDriverWait(driver, 2).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[text()=\"Identify photos of friends\"]")));
-            if(photoText != null){
+            if (photoText != null) {
                 System.out.println(String.format("Result is:%s", photoText.getText()));
                 fbData.setMessage(photoText.getText());
-            }else {
+            } else {
                 fbData.setMessage("NO PHOTO!");
             }
         } catch (RuntimeException e) {
