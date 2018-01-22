@@ -68,8 +68,8 @@ public class FacebookLoginLinuxTest {
     private void killChrome() {
         try {
             System.out.println("kill chrome thread!");
-            System.out.println("exec : ps -ef | grep chrome | grep -v grep | awk '{print $2}' | xargs kill");
-            Runtime.getRuntime().exec("ps -ef | grep chrome | grep -v grep | awk '{print $2}' | xargs kill");
+            System.out.println("exec : pkill -f -e chrome");
+            Runtime.getRuntime().exec("pkill -f -e chrome");
         } catch (IOException e) {
             e.printStackTrace();
         }
