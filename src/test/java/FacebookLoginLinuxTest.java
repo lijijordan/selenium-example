@@ -152,7 +152,9 @@ public class FacebookLoginLinuxTest {
                     driver.quit();
                 }
             } catch (org.openqa.selenium.WebDriverException e) {
-                try {
+                System.out.println("Exit system!");
+                System.exit(0);
+                /*try {
                     //
                     this.producer.publish(source);
                     System.out.println("Close driver exception:" + e.getMessage());
@@ -163,7 +165,7 @@ public class FacebookLoginLinuxTest {
                     Thread.sleep(1000 * 10);
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
-                }
+                }*/
             }
             // 登录成功
             if (currentUrl.indexOf("checkpoint") >= 0) {
