@@ -15,6 +15,6 @@ while true ; do
 #    echo "more than ${NUM} ${PRO_NAME}"
   fi
   echo "sleep 10 second"
-    sleep 60
+    sleep 10
 done
 exit 0

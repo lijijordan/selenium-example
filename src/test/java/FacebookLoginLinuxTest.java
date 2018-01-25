@@ -53,7 +53,7 @@ public class FacebookLoginLinuxTest {
     private UserDao userDao;
     private Producer producer;
     private Consumer consumer;
-
+    private int countConsume = 0;
 
     @Before
     public void init() {
@@ -74,7 +74,6 @@ public class FacebookLoginLinuxTest {
             e.printStackTrace();
         }
     }
-
 
     private void initGeckoDriver() {
         FirefoxOptions options = new FirefoxOptions();
@@ -115,7 +114,6 @@ public class FacebookLoginLinuxTest {
         }
     }
 
-
     private void loginFacebook(SourceData account, String source) {
         initChromeDriver();
         long start = System.currentTimeMillis();
@@ -154,18 +152,6 @@ public class FacebookLoginLinuxTest {
             } catch (org.openqa.selenium.WebDriverException e) {
                 System.out.println("Exit system!");
                 System.exit(0);
-                /*try {
-                    //
-                    this.producer.publish(source);
-                    System.out.println("Close driver exception:" + e.getMessage());
-                    System.out.println("Waiting for 10 second.....");
-                    Thread.sleep(1000 * 10);
-                    this.killChrome();
-                    System.out.println("Waiting for 10 second.....");
-                    Thread.sleep(1000 * 10);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }*/
             }
             // 登录成功
             if (currentUrl.indexOf("checkpoint") >= 0) {
@@ -181,7 +167,6 @@ public class FacebookLoginLinuxTest {
         }
     }
 
-
     @Test
     public void loginSingleFacebook() {
         System.out.println("Let us login FB!!!");
@@ -193,7 +178,6 @@ public class FacebookLoginLinuxTest {
 
     @Test
     public void loginFacebook() {
-        System.out.println("Let us login FB!!!");
         String source = this.consumer.consume();
         while (source != null) {
             SourceData user = this.parseUser(source);
@@ -207,7 +191,14 @@ public class FacebookLoginLinuxTest {
     @Test
     public void consume() {
 //        this.producer.publish("test123");
-        System.out.println(consumer.consume());
+        System.out.println("出栈：" + consumer.consume());
+    }
+
+    @Test
+    public void countConsumeSum() {
+        System.out.println("出栈：" + consumer.consume());
+        countConsume++;
+        System.out.println(countConsume);
     }
 
     private SourceData parseUser(String source) {

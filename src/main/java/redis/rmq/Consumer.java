@@ -37,7 +37,9 @@ public class Consumer {
     }
 
     public String consume() {
-        return readUntilEnd();
+        String data = readUntilEnd();
+        System.out.println("consume:" + data);
+        return data;
     }
 
     private String readUntilEnd() {
