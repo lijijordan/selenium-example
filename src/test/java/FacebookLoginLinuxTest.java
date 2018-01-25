@@ -196,9 +196,13 @@ public class FacebookLoginLinuxTest {
 
     @Test
     public void countConsumeSum() {
-        System.out.println("出栈：" + consumer.consume());
-        countConsume++;
-        System.out.println(countConsume);
+        String str = consumer.consume();
+        while (str != null) {
+            System.out.println("出栈：" + str);
+            countConsume++;
+            System.out.println(countConsume);
+            str = consumer.consume();
+        }
     }
 
     private SourceData parseUser(String source) {
