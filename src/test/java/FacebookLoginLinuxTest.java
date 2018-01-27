@@ -117,16 +117,23 @@ public class FacebookLoginLinuxTest {
     }
 
     private void initIP() {
-        initChromeDriver();
-        try {
-            driver.get(IP_URL);
-            WebElement ip = new WebDriverWait(driver, 1).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id='result']/div/p[1]/code")));
-            IP = ip.getText();
-            System.out.println(IP);
-        } catch (RuntimeException e) {
-            System.out.println("RuntimeException:" + e.getMessage());
-        } finally {
-            this.closeDriver();
+        if (IP == null) {
+            if (PropertiesUtil.getValue("ip") == null) {
+                initChromeDriver();
+                try {
+                    driver.get(IP_URL);
+                    WebElement ip = new WebDriverWait(driver, 1).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id='result']/div/p[1]/code")));
+                    IP = ip.getText();
+                    PropertiesUtil.save("ip", IP);
+                    System.out.println(IP);
+                } catch (RuntimeException e) {
+                    System.out.println("RuntimeException:" + e.getMessage());
+                } finally {
+                    this.closeDriver();
+                }
+            } else {
+                IP = PropertiesUtil.getValue("ip");
+            }
         }
     }
 
@@ -204,6 +211,10 @@ public class FacebookLoginLinuxTest {
 
     @Test
     public void loginFacebook() {
+        if (IP == null) {
+            System.out.println("No IP !!!!!!!!!!!!!");
+            return;
+        }
         String source = this.consumer.consume();
         while (source != null) {
             SourceData user = this.parseUser(source);
