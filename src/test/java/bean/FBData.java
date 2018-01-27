@@ -3,13 +3,14 @@ package bean;
 import java.util.Date;
 
 public class FBData {
-    Long id;
-    String name;
-    String password;
-    String type;
-    Date createTime;
-    String redirectUrl;
-    String message;
+    private Long id;
+    private String name;
+    private String password;
+    private String type;
+    private Date createTime;
+    private String redirectUrl;
+    private String message;
+    private String ip;
 
     public static FBData form(SourceData sourceData) {
         FBData fbData = new FBData();
@@ -17,6 +18,14 @@ public class FBData {
         fbData.setName(sourceData.getName());
         fbData.setPassword(sourceData.getPassword());
         return fbData;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public String getMessage() {

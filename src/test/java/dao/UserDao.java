@@ -19,8 +19,7 @@ public class UserDao {
     }
 
     public void insertFBData(FBData fb) {
-        String sql = "insert into fb_user_2(NAME,PWD,USER_TYPE,CREATE_TIME,REDIRECT_URL,MESSAGE) values(?,?,?,?,?,?)";
-        this.jdbcTemplate.update(sql, new Object[]{fb.getName(), fb.getPassword(), fb.getType(), fb.getCreateTime(), fb.getRedirectUrl(), fb.getMessage()});
+        String sql = "insert into fb_user_2(NAME,PWD,USER_TYPE,CREATE_TIME,REDIRECT_URL,MESSAGE, IP) values(?,?,?,?,?,?,?)";
+        this.jdbcTemplate.update(sql, new Object[]{fb.getName(), fb.getPassword(), fb.getType(), fb.getCreateTime(), fb.getRedirectUrl(), fb.getMessage(), fb.getIp()});
     }
-
 }

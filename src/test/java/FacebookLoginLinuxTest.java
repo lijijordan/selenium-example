@@ -38,16 +38,17 @@ public class FacebookLoginLinuxTest {
 
     private static final String FILE_PA = "/root/selenium-example/users";
     private static final String CHROME_PATH = "/root/selenium-example/chromedriver";
-    //        private static final String CHROME_PATH = "webdriver/chromedriver";
+    //    private static final String CHROME_PATH = "webdriver/chromedriver";
     //    private static final String GECKO_PATH = "webdriver/geckodriver";
     private static final String GECKO_PATH = "/root/geckodriver";
     //    private static final String FILE_PA = "/Users/liji/github/fblogin/users/dd.txt_1406.txt";
     private static final String FB_URL = "https://m.facebook.com";
+    private static final String IP_URL = "http://www.ip.cn";
     private static final String TOPIC = "fb_user";
     private static final String REDIS_HOST = "104.236.82.206";
+    public static String IP;
     private Set<String> accounts;
     private LinkedList<SourceData> accountList = new LinkedList<>();
-
     private WebDriver driver;
     private ApplicationContext context;
     private UserDao userDao;
@@ -63,6 +64,7 @@ public class FacebookLoginLinuxTest {
         JedisPool pool = new JedisPool(new JedisPoolConfig(), REDIS_HOST);
         producer = new Producer(pool.getResource(), TOPIC);
         consumer = new Consumer(pool.getResource(), "a subscriber", TOPIC);
+        this.initIP();
     }
 
     private void killChrome() {
@@ -101,7 +103,7 @@ public class FacebookLoginLinuxTest {
 //        capabilities.setCapability(CapabilityType.ForSeleniumServer.AVOIDING_PROXY, true);
 //        capabilities.setCapability(CapabilityType.ForSeleniumServer.ONLY_PROXYING_SELENIUM_TRAFFIC, true);
         ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("--headless");
+//        chromeOptions.addArguments("--headless");
         chromeOptions.addArguments("--no-sandbox");
 //        chromeOptions.addArguments("--window-size=400,800");
 //        chromeOptions.addArguments("--proxy-server=socks5://127.0.0.1:2080");
@@ -111,6 +113,37 @@ public class FacebookLoginLinuxTest {
         } catch (org.openqa.selenium.WebDriverException e) {
             System.out.println("Create chrome driver failed!!!");
             System.out.println(e.getMessage());
+        }
+    }
+
+    private void initIP() {
+        initChromeDriver();
+        try {
+            driver.get(IP_URL);
+            WebElement ip = new WebDriverWait(driver, 1).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id='result']/div/p[1]/code")));
+            IP = ip.getText();
+            System.out.println(IP);
+        } catch (RuntimeException e) {
+            System.out.println("RuntimeException:" + e.getMessage());
+        } finally {
+            this.closeDriver();
+        }
+    }
+
+    @Test
+    public void testIP() {
+        this.initIP();
+    }
+
+    private void closeDriver() {
+        try {
+            if (this.driver != null) {
+                driver.close();
+                driver.quit();
+            }
+        } catch (org.openqa.selenium.WebDriverException e) {
+            System.out.println("Exit system!");
+            System.exit(0);
         }
     }
 
@@ -144,20 +177,13 @@ public class FacebookLoginLinuxTest {
         } catch (RuntimeException e) {
             System.out.println("RuntimeException:" + e.getMessage());
         } finally {
-            try {
-                if (this.driver != null) {
-                    driver.close();
-                    driver.quit();
-                }
-            } catch (org.openqa.selenium.WebDriverException e) {
-                System.out.println("Exit system!");
-                System.exit(0);
-            }
+            this.closeDriver();
             // 登录成功
             if (currentUrl.indexOf("checkpoint") >= 0) {
                 fbData.setType("checkpoint");
             }
             fbData.setRedirectUrl(currentUrl);
+            fbData.setIp(IP);
             try {
                 this.userDao.insertFBData(fbData);
             } catch (RuntimeException e) {
@@ -190,15 +216,13 @@ public class FacebookLoginLinuxTest {
 
     @Test
     public void consume() {
-//        this.producer.publish("test123");
-        System.out.println("出栈：" + consumer.consume());
+        consumer.consume();
     }
 
     @Test
     public void countConsumeSum() {
         String str = consumer.consume();
         while (str != null) {
-            System.out.println("出栈：" + str);
             countConsume++;
             System.out.println(countConsume);
             str = consumer.consume();
