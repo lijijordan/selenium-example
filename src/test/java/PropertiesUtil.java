@@ -40,7 +40,7 @@ public class PropertiesUtil {
             prop.load(input);
             // get the property value and print it out
             val = prop.getProperty(key);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             if (input != null) {
