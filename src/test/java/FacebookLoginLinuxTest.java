@@ -64,7 +64,7 @@ public class FacebookLoginLinuxTest {
         JedisPool pool = new JedisPool(new JedisPoolConfig(), REDIS_HOST);
         producer = new Producer(pool.getResource(), TOPIC);
         consumer = new Consumer(pool.getResource(), "a subscriber", TOPIC);
-//        this.initIP();
+        this.initIP();
     }
 
     private void killChrome() {
