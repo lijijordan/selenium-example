@@ -64,7 +64,7 @@ public class FacebookLoginLinuxTest {
         JedisPool pool = new JedisPool(new JedisPoolConfig(), REDIS_HOST);
         producer = new Producer(pool.getResource(), TOPIC);
         consumer = new Consumer(pool.getResource(), "a subscriber", TOPIC);
-        this.initIP();
+//        this.initIP();
     }
 
     private void killChrome() {
@@ -220,6 +220,11 @@ public class FacebookLoginLinuxTest {
     }
 
     @Test
+    public void unreadMessages() {
+        System.out.println("unread messages:" + this.consumer.unreadMessages());
+    }
+
+    @Test
     public void countConsumeSum() {
         String str = consumer.consume();
         while (str != null) {
@@ -254,6 +259,14 @@ public class FacebookLoginLinuxTest {
         for (String string : set) {
             System.out.println(String.format("Ready to publish %s ", string));
             this.producer.publish(string);
+        }
+    }
+
+    @Test
+    public void emptyQueue() {
+        String source = this.consumer.consume();
+        while (source != null) {
+            source = this.consumer.consume();
         }
     }
 }
